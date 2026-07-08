@@ -1,0 +1,23 @@
+jyothsna,Ramanujan,ATL,BFS
+jyothsna,CV Raman,Rajaraman,BFS
+jyothsna,Main Gate,CV Raman,Dijkstra
+nidheesha,ATL,Library,DFS
+jyothsna,Parking,Library,BFS
+jyothsna,Parking,Library,BFS
+jyothsna,Parking,Library,BFS
+anuradha,CV Raman,Library,BFS
+anuradha,CV Raman,Library,BFS
+anuradha,CV Raman,Library,BFS
+anuradha,Rajaraman,Library,BFS
+anuradha,Main Gate,SMV,BFS
+anuradha,APJ,ATL,BFS
+anuradha,ATL,APJ,Dijkstra
+anuradha,Canteen,Main Gate,Dijkstra
+anuradha,Hostel,Main Gate,Dijkstra
+anuradha,Hostel,Canteen,Dijkstra
+anuradha,Canteen,Main Gate,DFS
+anuradha,Canteen,Main Gate,DFS
+anuradha,Ramanujan,CV Raman,DFS
+anuradha,Hostel,Parking,DFS
+anuradha,ATL,APJ,BFS
+anuradha,Rajaraman,Canteen,Dijkstra

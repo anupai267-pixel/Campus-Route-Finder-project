@@ -53,7 +53,10 @@
     {% if result is none %}
       <p class="empty-state">Run a search to see results here.</p>
 
-    {% elif result.type == 'bfs' %}
+    {% else %}
+    <div class="result-panel result-{{ result.type }}">
+
+    {% if result.type == 'bfs' %}
       {% if result.path %}
         <p class="result-label">Fewest stops: {{ result.path|length - 1 }}</p>
         <div class="route-path">
@@ -138,6 +141,8 @@
       {% else %}
         <p class="empty-state">Every location can reach every other location.</p>
       {% endif %}
+    {% endif %}
+    </div>
     {% endif %}
   </div>
 </div>

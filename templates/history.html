@@ -13,7 +13,17 @@
         {% for start, end, method in records %}
           <tr>
             <td>{{ loop.index }}</td>
-            <td>{{ method }}</td>
+            <td>
+              {% if method == 'BFS' %}
+                <span class="badge badge-bfs">BFS</span>
+              {% elif method == 'Dijkstra' %}
+                <span class="badge badge-dijkstra">Dijkstra</span>
+              {% elif method == 'DFS' %}
+                <span class="badge badge-dfs">DFS</span>
+              {% else %}
+                {{ method }}
+              {% endif %}
+            </td>
             <td>{{ start }}</td>
             <td>{{ end }}</td>
           </tr>

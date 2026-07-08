@@ -86,6 +86,8 @@ def dashboard():
 
         elif mode == 'dfs':
             paths = dfs_all_paths(start, end)
+            if paths:
+                save_history(session['username'], start, end, 'DFS')
             result = {'type': 'dfs', 'paths': paths}
 
         elif mode == 'avoid':
@@ -132,4 +134,4 @@ def history_clear():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
