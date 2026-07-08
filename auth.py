@@ -1,15 +1,11 @@
 # auth.py
-# Handles user registration and login using a simple text file as storage.
-# Each line in users.txt looks like: username,password
-
 import os
 
 USER_FILE = "users.txt"
+MIN_PASSWORD_LENGTH = 6
 
 
 def load_users():
-    """Reads users.txt and returns a dictionary {username: password}.
-    If the file doesn't exist yet, returns an empty dictionary."""
     users = {}
     if not os.path.exists(USER_FILE):
         return users
@@ -26,64 +22,34 @@ def load_users():
 
 
 def save_user(username, password):
-    """Appends a new username,password line to users.txt."""
     with open(USER_FILE, "a") as file:
         file.write(f"{username},{password}\n")
 
 
-MIN_PASSWORD_LENGTH = 6
-
-
-def register():
-    """Asks the user for a new username and password, with confirmation
-    and basic validation. Refuses to register if the username already
-    exists, the password is too short, or the two password entries don't match."""
+def register_user(username, password, confirm_password):
+    """Validates and creates a new user account.
+    Returns (True, success_message) or (False, error_message)."""
     users = load_users()
-
-    print("\n--- Register ---")
-    username = input("Choose a username: ").strip()
 
     if username == "":
-        print("Username cannot be empty.")
-        return False
-
+        return False, "Username cannot be empty."
     if username in users:
-        print("That username is already taken. Please try logging in instead.")
-        return False
-
-    password = input("Choose a password: ").strip()
-
+        return False, "That username is already taken. Please log in instead."
     if password == "":
-        print("Password cannot be empty.")
-        return False
-
+        return False, "Password cannot be empty."
     if len(password) < MIN_PASSWORD_LENGTH:
-        print(f"Password must be at least {MIN_PASSWORD_LENGTH} characters long.")
-        return False
-
-    confirm_password = input("Confirm your password: ").strip()
-
+        return False, f"Password must be at least {MIN_PASSWORD_LENGTH} characters long."
     if password != confirm_password:
-        print("Passwords do not match. Please try registering again.")
-        return False
+        return False, "Passwords do not match."
 
     save_user(username, password)
-    print(f"Account created for '{username}'. You can now log in.")
-    return True
+    return True, f"Account created for '{username}'. You can now log in."
 
 
-def login():
-    """Asks for username and password, checks them against users.txt.
-    Returns the username (string) if login succeeds, or None if it fails."""
+def verify_login(username, password):
+    """Checks credentials against users.txt.
+    Returns (username, message) on success, or (None, message) on failure."""
     users = load_users()
-
-    print("\n--- Login ---")
-    username = input("Username: ").strip()
-    password = input("Password: ").strip()
-
     if username in users and users[username] == password:
-        print(f"\nWelcome back, {username}!")
-        return username
-    else:
-        print("Incorrect username or password.")
-        return None
+        return username, f"Welcome back, {username}!"
+    return None, "Incorrect username or password."

@@ -1,0 +1,4 @@
+users.txt
+history.txt
+__pycache__/
+*.pyc

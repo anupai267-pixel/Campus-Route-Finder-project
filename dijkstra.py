@@ -4,10 +4,6 @@ from graph import get_neighbors, get_all_locations
 
 
 def dijkstra_shortest_path(start, end, avoid=None):
-    """
-    Finds the shortest path by total distance using Dijkstra's algorithm.
-    Returns (path_list, total_distance) or (None, None) if no path exists.
-    """
     distances = {loc: float("inf") for loc in get_all_locations()}
     parent = {loc: None for loc in get_all_locations()}
 
@@ -15,7 +11,7 @@ def dijkstra_shortest_path(start, end, avoid=None):
         return None, None
 
     distances[start] = 0
-    priority_queue = [(0, start)]  # (distance_so_far, location)
+    priority_queue = [(0, start)]
     visited = set()
 
     while priority_queue:
@@ -40,7 +36,6 @@ def dijkstra_shortest_path(start, end, avoid=None):
     if distances[end] == float("inf"):
         return None, None
 
-    # Rebuild the path by walking backwards through 'parent'
     path = []
     node = end
     while node is not None:

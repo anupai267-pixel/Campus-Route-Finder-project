@@ -3,10 +3,6 @@ from graph import get_neighbors, get_all_locations
 
 
 def dfs_all_paths(start, end, path=None, all_paths=None):
-    """
-    Recursively explores every possible route from start to end.
-    Returns a list of paths (each path is a list of location names).
-    """
     if path is None:
         path = [start]
     if all_paths is None:
@@ -17,16 +13,15 @@ def dfs_all_paths(start, end, path=None, all_paths=None):
         return all_paths
 
     for neighbor, distance in get_neighbors(start):
-        if neighbor not in path:  # avoid going in circles
+        if neighbor not in path:
             path.append(neighbor)
             dfs_all_paths(neighbor, end, path, all_paths)
-            path.pop()  # backtrack: remove neighbor before trying the next option
+            path.pop()
 
     return all_paths
 
 
 def find_reachable_locations(start):
-    """Returns the set of every location you can reach from 'start'."""
     visited = set()
     stack = [start]
 
@@ -42,11 +37,6 @@ def find_reachable_locations(start):
 
 
 def check_disconnected():
-    """
-    Checks every location in the graph and reports which other locations
-    it CANNOT reach. Returns a dictionary: {location: set_of_unreachable_locations}.
-    Only locations with at least one unreachable target are included.
-    """
     all_locations = set(get_all_locations())
     report = {}
 

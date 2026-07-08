@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}History - Campus Route Finder{% endblock %}
+{% block content %}
+<h1>Your route history</h1>
+
+<div class="card">
+  {% if records %}
+    <table class="history-table">
+      <thead>
+        <tr><th>#</th><th>Method</th><th>From</th><th>To</th></tr>
+      </thead>
+      <tbody>
+        {% for start, end, method in records %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ method }}</td>
+            <td>{{ start }}</td>
+            <td>{{ end }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <form method="POST" action="{{ url_for('history_clear') }}" onsubmit="return confirm('Delete all of your route history? This cannot be undone.');">
+      <button type="submit" class="btn-danger">Clear my history</button>
+    </form>
+  {% else %}
+    <p class="empty-state">You haven't searched any routes yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

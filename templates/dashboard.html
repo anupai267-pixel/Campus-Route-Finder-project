@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}Find Route - Campus Route Finder{% endblock %}
+{% block content %}
+<h1>Hi {{ username }}, where are you headed?</h1>
+
+<div class="dashboard-grid">
+  <div class="card">
+    <h2>Search</h2>
+    <form method="POST" id="search-form">
+      <label for="mode">What do you want to do?</label>
+      <select id="mode" name="mode" onchange="updateFields()">
+        <option value="bfs">Shortest route by stops (BFS)</option>
+        <option value="dijkstra">Shortest route by distance (Dijkstra)</option>
+        <option value="dfs">Show all possible routes (DFS)</option>
+        <option value="avoid">Find route avoiding a location</option>
+        <option value="reachable">List locations reachable from a point</option>
+        <option value="disconnected">Check for disconnected locations</option>
+      </select>
+
+      <div id="field-start">
+        <label for="start">Start location</label>
+        <select id="start" name="start">
+          {% for loc in locations %}
+            <option value="{{ loc }}">{{ loc }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div id="field-end">
+        <label for="end">Destination</label>
+        <select id="end" name="end">
+          {% for loc in locations %}
+            <option value="{{ loc }}">{{ loc }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div id="field-avoid" style="display:none;">
+        <label for="avoid">Location to avoid</label>
+        <select id="avoid" name="avoid">
+          {% for loc in locations %}
+            <option value="{{ loc }}">{{ loc }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <button type="submit" class="btn-primary">Search</button>
+    </form>
+  </div>
+
+  <div class="card results-card">
+    <h2>Results</h2>
+    {% if result is none %}
+      <p class="empty-state">Run a search to see results here.</p>
+
+    {% elif result.type == 'bfs' %}
+      {% if result.path %}
+        <p class="result-label">Fewest stops: {{ result.path|length - 1 }}</p>
+        <div class="route-path">
+          {% for loc in result.path %}
+            <span class="route-node">{{ loc }}</span>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="empty-state">No path found between these two locations.</p>
+      {% endif %}
+
+    {% elif result.type == 'dijkstra' %}
+      {% if result.path %}
+        <p class="result-label">Total distance: {{ result.distance }} meters</p>
+        <div class="route-path">
+          {% for loc in result.path %}
+            <span class="route-node">{{ loc }}</span>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="empty-state">No path found between these two locations.</p>
+      {% endif %}
+
+    {% elif result.type == 'dfs' %}
+      {% if result.paths %}
+        <p class="result-label">{{ result.paths|length }} possible route(s) found</p>
+        {% for path in result.paths %}
+          <div class="route-path route-path-small">
+            {% for loc in path %}
+              <span class="route-node">{{ loc }}</span>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="empty-state">No path found between these two locations.</p>
+      {% endif %}
+
+    {% elif result.type == 'avoid' %}
+      <p class="result-label">Avoiding: {{ result.avoid }}</p>
+      <h3 class="subresult-title">BFS (fewest stops)</h3>
+      {% if result.bfs_path %}
+        <div class="route-path">
+          {% for loc in result.bfs_path %}
+            <span class="route-node">{{ loc }}</span>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="empty-state">No path found while avoiding this location.</p>
+      {% endif %}
+
+      <h3 class="subresult-title">Dijkstra (shortest distance)</h3>
+      {% if result.dij_path %}
+        <p class="result-label">Total distance: {{ result.dij_distance }} meters</p>
+        <div class="route-path">
+          {% for loc in result.dij_path %}
+            <span class="route-node">{{ loc }}</span>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="empty-state">No path found while avoiding this location.</p>
+      {% endif %}
+
+    {% elif result.type == 'reachable' %}
+      {% if result.reachable %}
+        <p class="result-label">Reachable from {{ result.start }}:</p>
+        <ul class="plain-list">
+          {% for loc in result.reachable %}
+            <li>{{ loc }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty-state">No other locations are reachable from here.</p>
+      {% endif %}
+
+    {% elif result.type == 'disconnected' %}
+      {% if result.report %}
+        <ul class="plain-list">
+          {% for loc, unreachable in result.report.items() %}
+            <li><strong>{{ loc }}</strong> cannot reach: {{ unreachable|join(', ') }}</li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="empty-state">Every location can reach every other location.</p>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+
+<script>
+function updateFields() {
+  var mode = document.getElementById('mode').value;
+  var startField = document.getElementById('field-start');
+  var endField = document.getElementById('field-end');
+  var avoidField = document.getElementById('field-avoid');
+
+  startField.style.display = 'block';
+  endField.style.display = 'block';
+  avoidField.style.display = 'none';
+
+  if (mode === 'reachable') {
+    endField.style.display = 'none';
+  } else if (mode === 'disconnected') {
+    startField.style.display = 'none';
+    endField.style.display = 'none';
+  } else if (mode === 'avoid') {
+    avoidField.style.display = 'block';
+  }
+}
+
+updateFields();
+</script>
+{% endblock %}
