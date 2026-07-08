@@ -1,4 +1,5 @@
 # main.py
+from auth import login, register
 from graph import get_all_locations
 from bfs import bfs_shortest_path
 from dijkstra import dijkstra_shortest_path
@@ -147,5 +148,33 @@ def main():
             print("Invalid choice, please enter a number from 1 to 7.")
 
 
+def show_auth_menu():
+    print("\n=== Welcome to Campus Route Finder ===")
+    print("1. Login")
+    print("2. Register")
+    print("3. Exit")
+
+
+def authenticate():
+    """Loops until the user successfully logs in, registers, or exits.
+    Returns True if the user is now logged in, False if they chose to exit."""
+    while True:
+        show_auth_menu()
+        choice = input("Choose an option (1-3): ").strip()
+
+        if choice == "1":
+            if login():
+                return True
+        elif choice == "2":
+            register()
+        elif choice == "3":
+            return False
+        else:
+            print("Invalid choice, please enter 1, 2, or 3.")
+
+
 if __name__ == "__main__":
-    main()
+    if authenticate():
+        main()
+    else:
+        print("Goodbye!")
