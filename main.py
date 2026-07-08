@@ -1,9 +1,11 @@
 # main.py
-from auth import login, register
+from history import save_history, get_history, clear_history
 from graph import get_all_locations
 from bfs import bfs_shortest_path
 from dijkstra import dijkstra_shortest_path
 from dfs import dfs_all_paths, check_disconnected, find_reachable_locations
+from auth import login, register
+from history import save_history, get_history
 
 
 def print_path(path):
@@ -29,15 +31,18 @@ def ask_locations():
     return start, end
 
 
-def run_bfs():
+def run_bfs(username):
     start, end = ask_locations()
     if start is None:
         return
     print("\n--- BFS Result (fewest stops) ---")
-    print_path(bfs_shortest_path(start, end))
+    path = bfs_shortest_path(start, end)
+    print_path(path)
+    if path is not None:
+        save_history(username, start, end, "BFS")
 
 
-def run_dijkstra():
+def run_dijkstra(username):
     start, end = ask_locations()
     if start is None:
         return
@@ -48,6 +53,7 @@ def run_dijkstra():
     else:
         print(" -> ".join(path))
         print(f"Total distance: {total_distance} meters")
+        save_history(username, start, end, "Dijkstra")
 
 
 def run_dfs_all_paths():
@@ -113,6 +119,25 @@ def run_reachable_from():
             print(" -", loc)
 
 
+def run_view_history(username):
+    records = get_history(username)
+    print(f"\n--- Route History for {username} ---")
+    if not records:
+        print("You haven't searched any routes yet.")
+    else:
+        for i, (start, end, method) in enumerate(records, start=1):
+            print(f"{i}. [{method}] {start} -> {end}")
+
+
+def run_clear_history(username):
+    confirm = input(f"Are you sure you want to delete ALL of your route history, {username}? (yes/no): ").strip().lower()
+    if confirm == "yes":
+        clear_history(username)
+        print("Your route history has been cleared.")
+    else:
+        print("Cancelled. Your history was not changed.")
+
+
 def show_menu():
     print("\n=== Campus Route Finder ===")
     print("1. Find shortest route by stops (BFS)")
@@ -121,18 +146,23 @@ def show_menu():
     print("4. Check for disconnected locations")
     print("5. Find route while avoiding a location")
     print("6. List all locations reachable from a point")
-    print("7. Exit")
+    print("7. View my route history")
+    print("8. Clear my route history")
+    print("9. Logout")
+    print("10. Exit program")
 
 
-def main():
+def main(username):
+    """Runs the route finder menu for the given logged-in username.
+    Returns 'logout' or 'exit' depending on what the user chose."""
     while True:
         show_menu()
-        choice = input("Choose an option (1-7): ").strip()
+        choice = input("Choose an option (1-10): ").strip()
 
         if choice == "1":
-            run_bfs()
+            run_bfs(username)
         elif choice == "2":
-            run_dijkstra()
+            run_dijkstra(username)
         elif choice == "3":
             run_dfs_all_paths()
         elif choice == "4":
@@ -142,10 +172,16 @@ def main():
         elif choice == "6":
             run_reachable_from()
         elif choice == "7":
-            print("Goodbye!")
-            break
+            run_view_history(username)
+        elif choice == "8":
+            run_clear_history(username)
+        elif choice == "9":
+            print("Logging out...")
+            return "logout"
+        elif choice == "10":
+            return "exit"
         else:
-            print("Invalid choice, please enter a number from 1 to 7.")
+            print("Invalid choice, please enter a number from 1 to 10.")
 
 
 def show_auth_menu():
@@ -157,24 +193,34 @@ def show_auth_menu():
 
 def authenticate():
     """Loops until the user successfully logs in, registers, or exits.
-    Returns True if the user is now logged in, False if they chose to exit."""
+    Returns the logged-in username (string) on success, or None if they chose to exit."""
     while True:
         show_auth_menu()
         choice = input("Choose an option (1-3): ").strip()
 
         if choice == "1":
-            if login():
-                return True
+            username = login()
+            if username is not None:
+                return username
         elif choice == "2":
             register()
         elif choice == "3":
-            return False
+            return None
         else:
             print("Invalid choice, please enter 1, 2, or 3.")
 
 
 if __name__ == "__main__":
-    if authenticate():
-        main()
-    else:
-        print("Goodbye!")
+    while True:
+        current_user = authenticate()
+        if current_user is None:
+            print("Goodbye!")
+            break
+
+        result = main(current_user)
+
+        if result == "exit":
+            print("Goodbye!")
+            break
+        # if result == "logout", the outer while loop goes back to
+        # authenticate() automatically, showing the login screen again
